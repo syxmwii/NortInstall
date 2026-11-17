@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Установка IPA — NortInstall</title>
+<link rel="icon" type="image/png" href="favicon-192.png">
+<link rel="stylesheet" href="animations.css">
+<style>
+  :root {
+    --bg: #0b0d12;
+    --card: #141822;
+    --border: #232a3a;
+    --text: #e8ebf2;
+    --muted: #8b93a7;
+    --accent: #26d83c;
+    --ok: #34c77b;
+    --warn: #ffb454;
+    --danger: #ff6b6b;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    max-width: 460px;
+    width: 100%;
+    padding: 28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.45);
+  }
+  .icon {
+    width: 64px; height: 64px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+  }
+  h1 { font-size: 22px; margin-bottom: 6px; }
+  .sub { color: var(--muted); font-size: 15px; margin-bottom: 18px; }
+  .source {
+    background: rgba(38,216,60,.08);
+    border: 1px solid rgba(38,216,60,.35);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 14px;
+    word-break: break-all;
+    margin-bottom: 18px;
+  }
+  .source b { color: var(--accent); }
+  button {
+    width: 100%;
+    border: 0;
+    border-radius: 12px;
+    background: var(--accent);
+    color: #04140a;
+    font-size: 17px;
+    font-weight: 600;
+    padding: 15px;
+    cursor: pointer;
+  }
+  button:active { opacity: .8; }
+  button.secondary { background: transparent; border: 1px solid var(--border); color: var(--text); margin-top: 10px; font-weight: 500; }
+  .hint { color: var(--muted); font-size: 13px; margin-top: 14px; display: none; }
+  .hint.visible { display: block; }
+  .error { color: var(--danger); font-size: 15px; }
+  .ok { color: var(--ok); font-size: 14px; margin-top: 12px; display: none; }
+  .ok.visible { display: block; }
+  .warn { color: var(--warn); font-size: 13px; margin-top: 16px; }
+</style>
+</head>
+<body>
+<div class="card" id="ui">
+  <img class="icon" src="app-icon.png" alt="NortInstall">
+  <h1 id="title">Установка IPA</h1>
+  <p class="sub" id="sub">Проверьте источник файла и откройте его в NortInstall.</p>
+  <div class="source" id="source" hidden></div>
+  <button id="open" hidden>Открыть в NortInstall</button>
+  <button id="retry" class="secondary" hidden>Открыть ещё раз</button>
+  <p class="ok" id="done">Ссылка передана приложению ✔</p>
+  <p class="hint" id="hint">
+    Ничего не произошло? Значит NortInstall не установлен —
+    установите его и нажмите «Открыть ещё раз».
+  </p>
+  <p class="warn" id="warn">
+    ⚠️ Устанавливайте NortInstall только из официального репозитория.
+    Форки с тем же интерфейсом могут красть ваш Apple ID.
+  </p>
+</div>
+
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var raw = params.get("url") || "";
+  var valid = false;
+  var host = "";
+  var fileName = "";
+
+  try {
+    var u = new URL(raw);
+    if (u.protocol === "https:" && u.pathname.toLowerCase().endsWith(".ipa")) {
+      valid = true;
+      host = u.host;
+      fileName = decodeURIComponent(u.pathname.split("/").pop());
+    }
+  } catch (e) { /* пустая или кривая ссылка */ }
+
+  var source = document.getElementById("source");
+  var openBtn = document.getElementById("open");
+  var retryBtn = document.getElementById("retry");
+  var hint = document.getElementById("hint");
+  var done = document.getElementById("done");
+  var sub = document.getElementById("sub");
+
+  function openApp() {
+    done.classList.remove("visible");
+    location.href = "nortinstall://install?url=" + encodeURIComponent(raw);
+    // Приложение открылось — страница, скорее всего, уйдёт в фон.
+    setTimeout(function () { hint.classList.add("visible"); }, 1500);
+  }
+
+  if (valid) {
+    sub.textContent = "Файл будет скачан с этого сервера:";
+    source.hidden = false;
+    source.innerHTML = "<b>" + host + "</b><br>" + fileName;
+    openBtn.hidden = false;
+    openBtn.addEventListener("click", openApp);
+    retryBtn.hidden = false;
+    retryBtn.addEventListener("click", openApp);
+  } else {
+    document.getElementById("title").textContent = "Некорректная ссылка";
+    sub.innerHTML = "Нужна ссылка вида<br><code>open.html?url=https://…/app.ipa</code> — " +
+      "только <b>https</b> и файл <b>.ipa</b>.";
+    source.hidden = true;
+    openBtn.hidden = true;
+    retryBtn.hidden = true;
+    document.getElementById("warn").hidden = true;
+  }
+})();
+</script>
+<script src="animations.js"></script>
+</body>
+</html>

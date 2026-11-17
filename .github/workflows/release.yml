@@ -1,0 +1,100 @@
+name: release
+
+permissions:
+  contents: write
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  # 1. Собираем неподписанный IPA (как SideInstaller: никаких сертификатов
+  #    в основном репозитории — подпись отдельным шагом из секретов).
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust-core
+
+      - name: Rust core → NortInstallFFI.xcframework
+        run: ./scripts/build-rust.sh
+
+      - name: XcodeGen + unsigned IPA
+        run: |
+          brew install xcodegen
+          ./scripts/build-ipa.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NortInstall-unsigned
+          path: build/NortInstall.ipa
+          retention-days: 7
+
+  # 2. Подписываем каждым сертификатом из матрицы. Секреты:
+  #    CERT_<ID>_P12_B64      — .p12 в base64
+  #    CERT_<ID>_PASSWORD     — пароль от .p12
+  #    CERT_<ID>_PROFILE_B64  — .mobileprovision в base64
+  #    ID совпадает с web/config.js → NORT_CERTS.
+  sign:
+    needs: build
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        cert: [A, B, C, D, E, F, G, H, I, J, K, L]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: NortInstall-unsigned
+          path: build
+
+      - name: Sign NortInstall-${{ matrix.cert }}.ipa
+        env:
+          P12_B64: ${{ secrets[format('CERT_{0}_P12_B64', matrix.cert)] }}
+          P12_PASSWORD: ${{ secrets[format('CERT_{0}_PASSWORD', matrix.cert)] }}
+          PROFILE_B64: ${{ secrets[format('CERT_{0}_PROFILE_B64', matrix.cert)] }}
+          OUT: NortInstall-${{ matrix.cert }}.ipa
+        run: |
+          if [ -z "$P12_B64" ] || [ -z "$PROFILE_B64" ]; then
+            echo "::warning::Секреты CERT_${{ matrix.cert }}_* не заданы — пропускаем"
+            exit 0
+          fi
+          ./scripts/sign-ipa.sh build/NortInstall.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NortInstall-${{ matrix.cert }}
+          path: NortInstall-${{ matrix.cert }}.ipa
+          if-no-files-found: ignore
+          retention-days: 7
+
+  # 3. Публикуем релиз: неподписанный + все подписанные IPA.
+  #    Сайт берёт файлы отсюда: releases/latest/download/NortInstall[-ID].ipa
+  publish:
+    needs: [build, sign]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            artifacts/NortInstall.ipa
+            artifacts/NortInstall-*.ipa
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

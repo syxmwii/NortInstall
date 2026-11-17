@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- NortInstall DNS: DoH-профиль, чтобы Apple не отзывала сертификаты.
+     ID конфига NextDNS проекта: 26d83c (уже задан — пользователям ничего
+     настраивать не нужно, они просто скачивают этот файл).
+     Кастомный профиль можно собрать на web/dns.html. -->
+<plist version="1.0">
+<dict>
+	<key>ConsentText</key>
+	<dict>
+		<key>default</key>
+		<string>DNS-профиль NortInstall. Нужен, чтобы Apple не отзывала сертификаты. Можно удалить сразу после установки SideStore.</string>
+	</dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>DNSSettings</key>
+			<dict>
+				<key>DNSProtocol</key>
+				<string>HTTPS</string>
+				<key>ServerURL</key>
+				<string>https://apple.dns.nextdns.io/26d83c/NortInstall</string>
+			</dict>
+			<key>OnDemandRules</key>
+			<array>
+				<dict>
+					<key>Action</key>
+					<string>EvaluateConnection</string>
+					<key>ActionParameters</key>
+					<array>
+						<dict>
+							<key>DomainAction</key>
+							<string>NeverConnect</string>
+							<key>Domains</key>
+							<array>
+								<string>captive.apple.com</string>
+								<string>3gppnetwork.org</string>
+								<string>dav.orange.fr</string>
+								<string>vvm.mobistar.be</string>
+								<string>vvm.mstore.msg.t-mobile.com</string>
+								<string>tma.vvm.mone.pan-net.eu</string>
+								<string>vvm.ee.co.uk</string>
+							</array>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>Action</key>
+					<string>Connect</string>
+				</dict>
+			</array>
+			<key>PayloadDisplayName</key>
+			<string>NortInstall DNS</string>
+			<key>PayloadIdentifier</key>
+			<string>app.nortinstall.dns.settings</string>
+			<key>PayloadOrganization</key>
+			<string>NortInstall</string>
+			<key>PayloadType</key>
+			<string>com.apple.dnsSettings.managed</string>
+			<key>PayloadUUID</key>
+			<string>5D94C7E2-1B36-4F58-A7D9-8C0B24E63F1A</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+		</dict>
+	</array>
+	<key>PayloadDescription</key>
+	<string>DNS-профиль NortInstall. Нужен, чтобы Apple не отзывала сертификаты. Можно удалить сразу после установки SideStore.</string>
+	<key>PayloadDisplayName</key>
+	<string>NortInstall DNS</string>
+	<key>PayloadIdentifier</key>
+	<string>app.nortinstall.dns</string>
+	<key>PayloadScope</key>
+	<string>System</string>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>3F2B8A61-9C4D-4E17-B5A0-6D28F1C94E7B</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+	<key>TargetDeviceType</key>
+	<integer>1</integer>
+</dict>
+</plist>

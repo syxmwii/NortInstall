@@ -1,0 +1,4 @@
+module NortInstallFFI {
+    header "NortInstallFFI.h"
+    export *
+}

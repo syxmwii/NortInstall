@@ -1,0 +1,35 @@
+name: NortInstall
+
+options:
+  bundleIdPrefix: app.nortinstall
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+
+targets:
+  NortInstall:
+    type: application
+    platform: iOS
+    sources:
+      - ios-app
+    dependencies:
+      # Статическая библиотека rust-core, собранная scripts/build-rust.sh
+      - framework: build/NortInstallFFI.xcframework
+        embed: false
+    settings:
+      base:
+        # Swift находит ni_ipa_info через modulemap рядом с заголовком
+        SWIFT_INCLUDE_PATHS: "$(SRCROOT)/rust-core/include"
+        TARGETED_DEVICE_FAMILY: "1,2"
+    info:
+      path: ios-app/Info.plist
+      properties:
+        CFBundleDisplayName: NortInstall
+        CFBundleURLTypes:
+          - CFBundleURLName: app.nortinstall.install
+            CFBundleURLSchemes: [nortinstall]
+        UILaunchScreen: {}

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#26d83c"/>
+      <stop offset="1" stop-color="#0ea968"/>
+    </linearGradient>
+    <clipPath id="round">
+      <rect x="0" y="0" width="1024" height="1024" rx="228"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#round)">
+    <rect width="1024" height="1024" fill="#0b0d12"/>
+    <!-- телефон -->
+    <rect x="337" y="257" width="350" height="560" rx="70"
+          fill="none" stroke="url(#g)" stroke-width="42"/>
+    <!-- кнопка home -->
+    <rect x="452" y="700" width="120" height="26" rx="13" fill="url(#g)"/>
+    <!-- стрелка вниз, входящая в телефон -->
+    <rect x="489" y="140" width="46" height="335" rx="23" fill="url(#g)"/>
+    <path d="M408 400 L512 504 L616 400" fill="none" stroke="url(#g)"
+          stroke-width="46" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

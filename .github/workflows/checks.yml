@@ -1,0 +1,52 @@
+name: checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust-core
+      - run: cargo test --manifest-path rust-core/Cargo.toml
+      - run: cargo clippy --manifest-path rust-core/Cargo.toml -- -D warnings
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: JS-синтаксис и валидность DNS-профиля
+        run: |
+          node -e "
+            const fs = require('fs');
+            for (const f of ['web/dns.html', 'web/open.html', 'web/certificates.html', 'web/index.html', 'web/install.html']) {
+              const html = fs.readFileSync(f, 'utf8');
+              for (const m of html.matchAll(/<script>([\s\S]*?)<\/script>/g)) {
+                new Function(m[1]);
+              }
+              console.log(f, 'ok');
+            }
+            new Function(fs.readFileSync('web/config.js', 'utf8'));
+            console.log('config.js ok');
+            new Function(fs.readFileSync('web/animations.js', 'utf8'));
+            console.log('animations.js ok');
+          "
+      - uses: actions/setup-python@v5
+      - run: |
+          python -c "
+          import plistlib
+          with open('web/NortInstallDNS.mobileconfig','rb') as f:
+              plistlib.load(f)
+          print('DNS-профиль валиден')
+          "

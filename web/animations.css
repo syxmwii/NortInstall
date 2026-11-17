@@ -1,0 +1,64 @@
+/* NortInstall — общие анимации сайта.
+   Подключается на всех страницах вместе с animations.js. */
+
+/* Появление при скролле: элементы .reveal ставит animations.js */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity .55s ease, transform .55s cubic-bezier(.2, .7, .3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Плавность интерактива */
+a, button, .chip, .btn, .cta {
+  transition: background .2s ease, color .2s ease, border-color .2s ease,
+              box-shadow .25s ease, transform .15s ease;
+}
+.btn:active, .cta:active, button:active {
+  transform: scale(.97);
+}
+
+/* Подъём карточек при наведении */
+.step, .cert {
+  transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+.step:hover, .cert:hover {
+  transform: translateY(-4px);
+  border-color: rgba(38, 216, 60, .45);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .35);
+}
+
+/* Парение иконки в hero */
+@keyframes nort-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.hero .appicon {
+  animation: nort-float 4.5s ease-in-out infinite;
+}
+
+/* Появление hero при загрузке */
+@keyframes nort-hero-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+.hero h1, .hero p, .hero .cta {
+  animation: nort-hero-in .6s cubic-bezier(.2, .7, .3, 1) both;
+}
+.hero p { animation-delay: .08s; }
+.hero .cta { animation-delay: .16s; }
+
+/* Мягкое свечение акцентных кнопок */
+.btn:not(.ghost):hover, .cta:not(.ghost):hover {
+  box-shadow: 0 6px 24px rgba(38, 216, 60, .35);
+}
+
+/* Уважение к настройке «уменьшить движение» */
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .hero .appicon, .hero h1, .hero p, .hero .cta { animation: none; }
+  * { transition: none !important; }
+}

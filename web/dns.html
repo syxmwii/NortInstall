@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DNS-профиль — NortInstall</title>
+<link rel="icon" type="image/png" href="favicon-192.png">
+<link rel="stylesheet" href="animations.css">
+<style>
+  :root {
+    --bg: #0b0d12; --card: #141822; --border: #232a3a;
+    --text: #e8ebf2; --muted: #8b93a7; --accent: #26d83c; --warn: #ffb454;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 20px 60px; }
+  header { padding: 26px 0; }
+  .logo { font-weight: 700; font-size: 18px; }
+  .logo span { color: var(--accent); }
+  h1 { font-size: 30px; letter-spacing: -.02em; margin: 18px 0 10px; }
+  .lead { color: var(--muted); margin-bottom: 26px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 22px; margin-bottom: 22px;
+  }
+  h2 { font-size: 20px; margin-bottom: 12px; }
+  label { display: block; color: var(--muted); font-size: 14px; margin-bottom: 8px; }
+  input {
+    width: 100%; background: #0e1118; color: var(--text);
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px; font-size: 17px; outline: none;
+  }
+  input:focus { border-color: var(--accent); }
+  .err { color: #ff6b6b; font-size: 14px; margin-top: 8px; min-height: 20px; }
+  button {
+    width: 100%; border: 0; border-radius: 12px; background: var(--accent);
+    color: #04140a; font-size: 17px; font-weight: 600; padding: 15px; cursor: pointer;
+  }
+  button:disabled { opacity: .4; cursor: default; }
+  .why { color: var(--muted); font-size: 15px; }
+  .why code {
+    background: rgba(38,216,60,.1); border-radius: 6px; padding: 2px 7px;
+    font-size: .9em; word-break: break-all;
+  }
+  ol { padding-left: 22px; }
+  li { margin: 10px 0; }
+  li b { color: var(--text); }
+  .muted { color: var(--muted); font-size: 15px; }
+  .warn {
+    background: rgba(255,180,84,.07); border: 1px solid rgba(255,180,84,.4);
+    border-radius: 16px; padding: 18px; font-size: 15px;
+  }
+  .warn b { color: var(--warn); }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap logo">Nort<span>Install</span></div>
+</header>
+
+<div class="wrap">
+  <h1>DNS-профиль NortInstall</h1>
+  <p class="lead">
+    Профиль включает DNS-over-HTTPS с блокировкой серверов Apple, которые
+    отзывают сертификаты. Ставится один раз, удаляется после установки SideStore.
+  </p>
+
+  <div class="card">
+    <h2>1. Создайте конфиг NextDNS</h2>
+    <p class="why" style="margin-bottom:14px">
+      Зайдите на <b>nextdns.io</b> → <b>Start free</b> → создайте конфиг.
+      В разделе <b>Denylist</b> заблокируйте домены:
+    </p>
+    <p class="why">
+      <code>ocsp.apple.com</code> &nbsp; <code>ocsp2.apple.com</code> &nbsp; <code>ppq.apple.com</code>
+    </p>
+    <p class="why" style="margin-top:10px">
+      Затем откройте <b>Setup</b> → <b>Encrypted DNS</b> → скопируйте ID из
+      ссылки <code>https://apple.dns.nextdns.io/<b>ID</b>/…</code> (6 символов).
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>2. Соберите профиль</h2>
+    <label for="id">ID конфига NextDNS</label>
+    <input id="id" inputmode="latin" maxlength="6" placeholder="например, 73f83a" autocomplete="off">
+    <div class="err" id="err"></div>
+    <button id="dl" disabled>Скачать NortInstallDNS.mobileconfig</button>
+  </div>
+
+  <div class="card">
+    <h2>3. Установите профиль</h2>
+    <ol>
+      <li>Скачайте файл в <b>Safari</b> на iPhone/iPad.</li>
+      <li>Откройте <b>Настройки</b> → появится строка <b>«Профиль загружен»</b> → нажмите.</li>
+      <li><b>Установить</b> → введите код-пароль → <b>Установить</b> ещё раз.</li>
+      <li>Готово: <b>Настройки → Основные → VPN и DNS</b> → должен быть выбран <b>NortInstall DNS</b>.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>Как разрешить и проверить</h2>
+    <ol>
+      <li>Профиль DNS не требует VPN-разрешений — iOS ставит его как конфигурацию.</li>
+      <li>Проверка: откройте <b>nextdns.io</b> в браузере, конфиг покажет активность запросов.</li>
+      <li>Сайты Apple открываются как обычно — блокируются только проверки отзыва сертификатов.</li>
+      <li><b>Удаление после установки SideStore:</b> Настройки → Основные → VPN и DNS → NortInstall DNS → Удалить профиль.</li>
+    </ol>
+  </div>
+
+  <div class="warn">
+    <b>Зачем это нужно.</b> Enterprise-сертификаты (как и свободные слоты Apple ID)
+    проверяются Apple онлайн. <code>ppq.apple.com</code> и <code>ocsp*.apple.com</code>
+    сообщают устройству, что профиль отозван — DNS-профиль не даёт этим запросам
+    проходить, и приложение продолжает работать.
+  </div>
+</div>
+
+<script>
+(function () {
+  var input = document.getElementById("id");
+  var err = document.getElementById("err");
+  var btn = document.getElementById("dl");
+
+  function valid(v) { return /^[a-f0-9]{6}$/i.test(v); }
+
+  input.addEventListener("input", function () {
+    var v = input.value.trim();
+    if (v.length === 0) {
+      err.textContent = "";
+      btn.disabled = true;
+    } else if (valid(v)) {
+      err.textContent = "";
+      btn.disabled = false;
+    } else {
+      err.textContent = "ID — это 6 символов a–f и 0–9, как в ссылке nextdns.io.";
+      btn.disabled = true;
+    }
+  });
+
+  btn.addEventListener("click", function () {
+    var id = input.value.trim();
+    if (!valid(id)) return;
+
+    var profile = [
+      '<?xml version="1.0" encoding="UTF-8"?>',
+      '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">',
+      '<plist version="1.0">',
+      '<dict>',
+      '  <key>ConsentText</key><dict><key>default</key>',
+      '  <string>DNS-профиль NortInstall. Нужен, чтобы Apple не отзывала сертификаты. Можно удалить сразу после установки SideStore.</string>',
+      '  </dict>',
+      '  <key>PayloadContent</key><array><dict>',
+      '    <key>DNSSettings</key><dict>',
+      '      <key>DNSProtocol</key><string>HTTPS</string>',
+      '      <key>ServerURL</key><string>https://apple.dns.nextdns.io/' + id + '/NortInstall</string>',
+      '    </dict>',
+      '    <key>OnDemandRules</key><array>',
+      '      <dict><key>Action</key><string>EvaluateConnection</string>',
+      '        <key>ActionParameters</key><array><dict>',
+      '          <key>DomainAction</key><string>NeverConnect</string>',
+      '          <key>Domains</key><array>',
+      '            <string>captive.apple.com</string><string>3gppnetwork.org</string>',
+      '            <string>dav.orange.fr</string><string>vvm.mobistar.be</string>',
+      '            <string>vvm.mstore.msg.t-mobile.com</string>',
+      '            <string>tma.vvm.mone.pan-net.eu</string><string>vvm.ee.co.uk</string>',
+      '          </array>',
+      '        </dict></array></dict>',
+      '      <dict><key>Action</key><string>Connect</string></dict>',
+      '    </array>',
+      '    <key>PayloadDisplayName</key><string>NortInstall DNS</string>',
+      '    <key>PayloadIdentifier</key><string>app.nortinstall.dns.settings</string>',
+      '    <key>PayloadOrganization</key><string>NortInstall</string>',
+      '    <key>PayloadType</key><string>com.apple.dnsSettings.managed</string>',
+      '    <key>PayloadUUID</key><string>5D94C7E2-1B36-4F58-A7D9-8C0B24E63F1A</string>',
+      '    <key>PayloadVersion</key><integer>1</integer>',
+      '  </dict></array>',
+      '  <key>PayloadDescription</key>',
+      '  <string>DNS-профиль NortInstall. Нужен, чтобы Apple не отзывала сертификаты. Можно удалить сразу после установки SideStore.</string>',
+      '  <key>PayloadDisplayName</key><string>NortInstall DNS</string>',
+      '  <key>PayloadIdentifier</key><string>app.nortinstall.dns</string>',
+      '  <key>PayloadScope</key><string>System</string>',
+      '  <key>PayloadType</key><string>Configuration</string>',
+      '  <key>PayloadUUID</key><string>3F2B8A61-9C4D-4E17-B5A0-6D28F1C94E7B</string>',
+      '  <key>PayloadVersion</key><integer>1</integer>',
+      '  <key>TargetDeviceType</key><integer>1</integer>',
+      '</dict>',
+      '</plist>'
+    ].join("\n");
+
+    var blob = new Blob([profile], { type: "application/x-apple-aspen-config" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "NortInstallDNS.mobileconfig";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  });
+})();
+</script>
+<script src="animations.js"></script>
+</body>
+</html>

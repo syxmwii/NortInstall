@@ -1,0 +1,24 @@
+# Сборки Rust
+rust-core/target/
+
+# Xcode и производные сборки
+build/
+DerivedData/
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+*.xcuserstate
+
+# IPA и подписывающие материалы — не публиковать
+*.ipa
+*.p12
+*.mobileprovision
+*.pem
+*.key
+.env
+.env.*
+!.env.example
+
+# Системные файлы и логи
+.DS_Store
+*.log
