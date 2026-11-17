@@ -22,8 +22,7 @@ targets:
         embed: false
     settings:
       base:
-        # Swift находит ni_ipa_info через modulemap рядом с заголовком
-        SWIFT_INCLUDE_PATHS: "$(SRCROOT)/rust-core/include"
+        # Модуль NortInstallFFI и его заголовки поставляет XCFramework.
         TARGETED_DEVICE_FAMILY: "1,2"
     info:
       path: ios-app/Info.plist
